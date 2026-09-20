@@ -32,7 +32,7 @@ class FollowUpTask:
 
 # Sample notes (could be read from a file or stdin)
 SAMPLE_NOTES = [
-    "Customer at 123 Main St reported a leaking pipe. Used 2x 1/2" PVC pipe and sealant. Spent 45 minutes. Customer was upset but appreciative after fix.",
+    'Customer at 123 Main St reported a leaking pipe. Used 2x 1/2" PVC pipe and sealant. Spent 45 minutes. Customer was upset but appreciative after fix.',
     "Site: 45 Oak Avenue. Broken window latch. Replaced latch. 30 mins. Customer happy.",
     "Location: 78 Pine Rd. Air conditioner not cooling. Checked filter, cleaned. 20 mins. Customer neutral.",
 ]
