@@ -12,6 +12,7 @@ This repository is a learning/portfolio engineering lab. Preserve the distinctio
 - Keep setup and verification commands reproducible.
 - Preserve local-first operation unless a change explicitly introduces and documents an external dependency.
 - Never commit credentials, private user data, tokens, or environment-specific secrets.
+- Python example package directories use importable underscore names (for example, `field_ops_agent`), while user-facing titles may use normal prose.
 
 ## Required verification
 
