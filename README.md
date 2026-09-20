@@ -1,11 +1,11 @@
-# 🤖 Multi-Agent AI System
+# Agentic Systems Lab
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-saintlex.sbs-blue)](https://saintlex.sbs/)
+[![Portfolio](https://img.shields.io/badge/Portfolio-saintlex.sbs-blue)](https://saintlex.sbs/)
 [![CI](https://github.com/SaintChris/agentic-systems-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/SaintChris/agentic-systems-lab/actions)
 
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-> Portfolio lab exploring six agent roles, a shared task queue, and a Streamlit dashboard. This is a learning project, not a production deployment.
+> Portfolio lab exploring six agent roles, a shared task queue, and a lightweight Python/HTML monitoring dashboard. This is a learning project, not a production deployment.
 
 ---
 
@@ -17,27 +17,24 @@ A portfolio experiment that models six specialized agent roles coordinating thro
 - **Local-first experiment** — Designed around local and free-tier tooling; actual operating cost depends on the selected providers and environment
 - **Architecture experiment** — Delegation, tests, and monitoring concepts
 - **Built for learning and demonstration** — Not enterprise production experience
-- ✅ **Live dashboard** — Real-time monitoring via Streamlit
+- **Dashboard experiment** — Python HTTP server with a repo-local HTML UI, demo data, and optional Paperclip integration
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
+
+The safest reproducible entry point is the dashboard's mock-data mode:
 
 ```bash
 git clone https://github.com/SaintChris/agentic-systems-lab.git
 cd agentic-systems-lab
 
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-
-# Live mode (full backend)
-python3 dashboard/app.py
-
-# Demo mode (mock data, no backend needed)
 python3 dashboard/app.py --demo
 ```
 
-👉 Open `http://localhost:8501` for the live dashboard.
+Open `http://127.0.0.1:9120`.
+
+Live Paperclip mode is environment-dependent. Configure `PAPERCLIP_API_BASE` and `COMPANY_ID` before running `python3 dashboard/app.py`. Local file browsing/search is disabled by default; set `DASHBOARD_DATA_ROOT` only when you explicitly want to expose a specific local directory to the dashboard process.
 
 ---
 
@@ -75,11 +72,11 @@ python3 dashboard/app.py --demo
 ## ✨ Features
 
 - **Agent Delegation Bridge** — Seamless handoff between agents via shared task queue
-- **Live Dashboard** — Real-time Streamlit UI showing agent status, task queue, system health
+- **Dashboard UI** — Repo-local HTML served by a lightweight Python HTTP server with mock-data and optional live integration modes
 - **Cost-conscious design** — Supports local and free-tier components; no universal monthly-cost claim is made
 - **Demo Mode** — Run with mock data for instant demos (no backend dependencies)
-- **Test suite included** — Current public CI is failing and must be repaired before any passing-test claim is made
-- **Docker Ready** — One-command deployment with docker-compose
+- **Test suite included** — Current GitHub Actions CI is green; use the latest workflow result as the verification record
+- **Docker Compose integration** — Service wiring is checked in, but the complete multi-service stack is not claimed as end-to-end CI verified
 
 ---
 
@@ -102,13 +99,12 @@ The repaired baseline passed [CI](https://github.com/SaintChris/agentic-systems-
 | Layer | Technology |
 |-------|------------|
 | Language | Python 3.11+ |
-| API | FastAPI |
-| Dashboard | Streamlit |
-| Orchestration | Paperclip |
-| Vector DB | Qdrant |
-| LLM Inference | Ollama (local) |
-| Storage | PostgreSQL |
-| Deployment | Docker |
+| Dashboard | Python stdlib HTTP server + HTML/CSS/JS |
+| Orchestration integration | Paperclip |
+| Vector DB service | Qdrant |
+| LLM service | Ollama |
+| Storage service | PostgreSQL |
+| Deployment/integration config | Docker Compose |
 
 ---
 
@@ -116,7 +112,7 @@ The repaired baseline passed [CI](https://github.com/SaintChris/agentic-systems-
 
 ```
 agentic-systems-lab/
-├── dashboard/          # Streamlit UI — live monitoring + demo mode
+├── dashboard/          # Python/HTML monitoring UI — optional live integration + demo mode
 ├── docs/               # Architecture docs and diagrams
 ├── examples/           # Example agent workflow implementations
 ├── scripts/            # Utility and setup scripts
