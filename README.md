@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-saintlex.sbs-blue)](https://saintlex.sbs/)
 [![CI](https://github.com/SaintChris/portfolio-agentic-infra/actions/workflows/ci.yml/badge.svg)](https://github.com/SaintChris/portfolio-agentic-infra/actions)
 
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE) [![Readers](https://img.shields.io/badge/Readers-0-blue)](https://github.com/SaintChris/portfolio-agentic-infra)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 > Portfolio lab exploring six agent roles, a shared task queue, and a Streamlit dashboard. This is a learning project, not a production deployment.
 
@@ -149,7 +149,7 @@ MIT — Free to adapt and reuse.
 
 ## 👤 Author
 
-**Alex Bogle** — IT support and technical operations candidate based in Jamaica. This repository is a personal learning lab and is not presented as production employment experience.
+**Alex Bogle** — IoT & AI Technician based in Jamaica. This repository is a personal learning lab and is not presented as production employment experience.
 
 - 🌐 [saintlex.sbs](https://saintlex.sbs/)
 - 💼 [linkedin.com/in/alex-bogle](https://linkedin.com/in/alex-bogle)

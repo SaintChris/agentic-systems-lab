@@ -21,7 +21,7 @@ def assert_test(condition, name):
 # Test 1: Knowledge agent runs with query argument
 result = subprocess.run(
     [sys.executable, 
-     os.path.join(os.path.dirname(__file__), '..', 'examples', 'knowledge-agent', 'workflow.py'),
+     os.path.join(os.path.dirname(__file__), '..', 'examples', 'knowledge_agent', 'workflow.py'),
      "How do I handle a billing dispute?"],
     capture_output=True, text=True, timeout=15,
     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,7 +41,7 @@ assert_test("Error" not in output or "error" not in output.lower(), "No error me
 # Test 5: Test with different query
 result2 = subprocess.run(
     [sys.executable,
-     os.path.join(os.path.dirname(__file__), '..', 'examples', 'knowledge-agent', 'workflow.py'),
+     os.path.join(os.path.dirname(__file__), '..', 'examples', 'knowledge_agent', 'workflow.py'),
      "What is the onboarding process?"],
     capture_output=True, text=True, timeout=15,
     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

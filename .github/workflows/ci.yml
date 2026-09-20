@@ -26,9 +26,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run executable test scripts
         run: |
-          python -m pytest tests/ -v
+          set -euo pipefail
+          for test_file in tests/test_*.py; do
+            echo "Running $test_file"
+            python "$test_file"
+          done
 
   lint:
     runs-on: ubuntu-latest
