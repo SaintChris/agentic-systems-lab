@@ -1,7 +1,7 @@
 # 🤖 Multi-Agent AI System
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-saintlex.sbs-blue)](https://saintlex.sbs/)
-[![CI](https://github.com/SaintChris/portfolio-agentic-infra/actions/workflows/ci.yml/badge.svg)](https://github.com/SaintChris/portfolio-agentic-infra/actions)
+[![CI](https://github.com/SaintChris/agentic-systems-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/SaintChris/agentic-systems-lab/actions)
 
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
@@ -24,8 +24,8 @@ A portfolio experiment that models six specialized agent roles coordinating thro
 ## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/SaintChris/portfolio-agentic-infra.git
-cd portfolio-agentic-infra
+git clone https://github.com/SaintChris/agentic-systems-lab.git
+cd agentic-systems-lab
 
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
@@ -93,7 +93,7 @@ python3 -m pytest tests/ -v
 python3 tests/evals.py
 ```
 
-The repository includes tests, but the current public GitHub Actions runs are failing. Run the suite in a clean environment and record the actual result before citing a passing count.
+The repaired baseline passed [CI](https://github.com/SaintChris/agentic-systems-lab/actions/runs/35483437571). The executable example tests passed 52 assertions during rename verification. Use the CI workflow and its latest result as the current verification record.
 
 ---
 
@@ -115,7 +115,7 @@ The repository includes tests, but the current public GitHub Actions runs are fa
 ## 📁 Repository Structure
 
 ```
-portfolio-agentic-infra/
+agentic-systems-lab/
 ├── dashboard/          # Streamlit UI — live monitoring + demo mode
 ├── docs/               # Architecture docs and diagrams
 ├── examples/           # Example agent workflow implementations

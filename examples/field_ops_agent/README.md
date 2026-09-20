@@ -28,7 +28,7 @@ A field technician submits unstructured job notes (and optionally photos). The a
 
 ## Getting Started
 ```sh
-cd /Users/saint/github/portfolio-agentic-infra/examples/field-ops-agent
+cd examples/field_ops_agent  # from the repository root
 python3 workflow.py
 ```
 

@@ -6,8 +6,8 @@ Thank you for considering a contribution! This project follows a simple open-sou
 1. **Fork the repository** on GitHub.
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/yourusername/portfolio-agentic-infra.git
-   cd portfolio-agentic-infra
+   git clone https://github.com/yourusername/agentic-systems-lab.git
+   cd agentic-systems-lab
    ```
 3. **Create a new branch** for your feature or bug fix:
    ```bash
