@@ -4,21 +4,50 @@ Serves dark-theme dashboard with live Paperclip stats + file browser + search.
 """
 
 import json, os, re, subprocess, threading, time, sys
+from urllib.parse import urlparse
+
 DEMO = "--demo" in sys.argv
 
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
-API_BASE = "http://[HOST]:3100/api"
-COMPANY_ID = "[COMPANY_ID]"
-DASHBOARD_HTML = os.path.expanduser("~/Documents/Obsidian Vault/shared/projects/paperclip-dashboard/index.html")
-HOME = os.path.expanduser("~")
-ALLOWED_DIRS = [
-    os.path.expanduser("~/Documents/Obsidian Vault"),
-    os.path.expanduser("~/.shared"),
-    os.path.expanduser("~/.hermes"),
-    os.path.expanduser("~/Documents"),
-    HOME,
-]
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+API_BASE = os.getenv(
+    "PAPERCLIP_API_BASE",
+    "http://127.0.0.1:3100/api",
+).rstrip("/")
+COMPANY_ID = os.getenv("COMPANY_ID", "").strip()
+DASHBOARD_HTML = os.getenv(
+    "DASHBOARD_HTML",
+    os.path.join(APP_DIR, "index.html"),
+)
+
+DASHBOARD_HOST = os.getenv("DASHBOARD_HOST", "127.0.0.1")
+DASHBOARD_PORT = int(os.getenv("DASHBOARD_PORT", "9120"))
+
+DATA_ROOT = os.getenv("DASHBOARD_DATA_ROOT", "").strip()
+ALLOWED_DIRS = (
+    [os.path.realpath(os.path.expanduser(DATA_ROOT))]
+    if DATA_ROOT
+    else []
+)
+
+QDRANT_HOST = os.getenv("QDRANT_HOST", "127.0.0.1")
+QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "127.0.0.1")
+OLLAMA_PORT = int(os.getenv("OLLAMA_PORT", "11434"))
+
+
+def is_allowed_path(path):
+    if not ALLOWED_DIRS or not path:
+        return False
+    target = os.path.realpath(os.path.expanduser(path))
+    for root in ALLOWED_DIRS:
+        try:
+            if os.path.commonpath([target, root]) == root:
+                return True
+        except ValueError:
+            continue
+    return False
 
 _cache = {}
 _cache_lock = threading.Lock()
@@ -51,7 +80,7 @@ def update_cache():
             ]
             data["skillCount"] = 6
             data["heartbeats"] = [{"id": "run1", "agentId": "a2", "status": "running", "startedAt": time.time()}]
-            data["infra"] = {"Gateway": "ok", "Paperclip": "ok", "Qdrant": "ok", "Ollama": "ok"}
+            data["infra"] = {"Paperclip": "ok", "Qdrant": "ok", "Ollama": "ok"}
         else:
             agents = fetch_json(f"/companies/{COMPANY_ID}/agents")
             if agents:
@@ -75,32 +104,29 @@ def update_cache():
         time.sleep(30)
 
 def check_infra():
-    """Check status of core services."""
+    """Check status of optional local services."""
+    parsed = urlparse(API_BASE)
+    paperclip_host = parsed.hostname or "127.0.0.1"
+    paperclip_port = parsed.port or (443 if parsed.scheme == "https" else 80)
     services = {
-        "Gateway": ("[HOST]", 3100),  # Actually Paperclip — gateway doesn't have a port
-        "Paperclip": ("[HOST]", 3100),
-        "Qdrant": ("[HOST]", 6333),
-        "Ollama": ("[HOST]", 11434),
+        "Paperclip": (paperclip_host, paperclip_port),
+        "Qdrant": (QDRANT_HOST, QDRANT_PORT),
+        "Ollama": (OLLAMA_HOST, OLLAMA_PORT),
     }
-    # Also check gateway process
+
     result = {}
-    # Check gateway by process
-    gw = subprocess.run(["pgrep", "-f", "hermes.*gateway"], capture_output=True, text=True, timeout=3)
-    result["Gateway"] = "ok" if gw.returncode == 0 else "err"
-    # Check other services by port
     import socket
     for name, (host, port) in services.items():
-        if name == "Gateway":
-            continue
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(2)
-            s.connect((host, port))
-            s.close()
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(2)
+            sock.connect((host, port))
+            sock.close()
             result[name] = "ok"
-        except:
+        except OSError:
             result[name] = "err"
     return result
+
 
 def search_files(query, scope_dir, max_results=30):
     """Search file contents using rg or grep."""
@@ -187,11 +213,13 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             from urllib.parse import parse_qs
             qs = self.path.split("?", 1)[1] if "?" in self.path else ""
             params = parse_qs(qs)
-            dirpath = params.get("dir", [""])[0]
-            if dirpath and not any(os.path.realpath(dirpath).startswith(os.path.realpath(d)) for d in ALLOWED_DIRS if os.path.exists(dirpath)):
-                if not any(dirpath.startswith(d) for d in ALLOWED_DIRS):
-                    self.send_error(403, "Forbidden: path not in allowed dirs")
-                    return
+            dirpath = params.get("dir", [DATA_ROOT])[0]
+            if not is_allowed_path(dirpath):
+                self.send_error(
+                    403,
+                    "Local file browsing is disabled or the path is outside DASHBOARD_DATA_ROOT",
+                )
+                return
             try:
                 entries = []
                 for entry in sorted(os.listdir(dirpath)):
@@ -216,7 +244,7 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             qs = self.path.split("?", 1)[1] if "?" in self.path else ""
             params = parse_qs(qs)
             filepath = params.get("path", [""])[0]
-            if not any(filepath.startswith(d) for d in ALLOWED_DIRS):
+            if not is_allowed_path(filepath):
                 self.send_error(403, "Forbidden")
                 return
             try:
@@ -241,9 +269,15 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             qs = self.path.split("?", 1)[1] if "?" in self.path else ""
             params = parse_qs(qs)
             query = params.get("q", [""])[0]
-            scope = params.get("scope", [HOME + "/Documents/Obsidian Vault"])[0]
+            scope = params.get("scope", [DATA_ROOT])[0]
             if not query:
                 self.send_error(400, "Missing query")
+                return
+            if not is_allowed_path(scope):
+                self.send_error(
+                    403,
+                    "Search is disabled or the scope is outside DASHBOARD_DATA_ROOT",
+                )
                 return
             results = search_files(query, scope)
             payload = json.dumps(results).encode()
@@ -281,8 +315,8 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 data = json.loads(body)
                 filepath = data.get("path", "")
                 content = data.get("content", "")
-                if not any(filepath.startswith(d) for d in ALLOWED_DIRS):
-                    self.send_error(403, "Forbidden: path not in allowed dirs")
+                if not is_allowed_path(filepath):
+                    self.send_error(403, "Forbidden: path outside DASHBOARD_DATA_ROOT")
                     return
                 os.makedirs(os.path.dirname(filepath), exist_ok=True)
                 with open(filepath, "w") as f:
@@ -301,8 +335,11 @@ class DashboardHandler(SimpleHTTPRequestHandler):
         pass
 
 def run():
-    server = ThreadingHTTPServer(("[HOST]", 9120), DashboardHandler)
-    print("Dashboard: http://[HOST]:9120", flush=True)
+    server = ThreadingHTTPServer((DASHBOARD_HOST, DASHBOARD_PORT), DashboardHandler)
+    print(
+        f"Dashboard: http://{DASHBOARD_HOST}:{DASHBOARD_PORT}",
+        flush=True,
+    )
     server.serve_forever()
 
 if __name__ == "__main__":
